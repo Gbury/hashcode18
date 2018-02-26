@@ -53,7 +53,12 @@ let cumulated_sums_2d data of_cell zero add neg =
   done;
   sums
 
+let transpose t =
+  Array.init (Array.length t.(0)) (fun i ->
+      Array.init (Array.length t) (fun j -> t.(j).(i)))
+
 let mk l h pizza =
+  let pizza = transpose pizza in
   let sums = cumulated_sums_2d pizza
       (function M -> 1 | T -> 0) 0 ( + ) ( ~- ) in
   let slices = size_rects l h in
