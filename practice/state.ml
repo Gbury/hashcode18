@@ -35,7 +35,11 @@ let mk l h pizza =
   done;
   { l; h; pizza; sums; }
 
+let sums_m sums (a1, b1) (a2, b2) = (* bounds included *)
+  sums.(a2 + 1).(b2 + 1).m - sums.(a2 + 1).(b1).m - sums.(a1).(b2 + 1).m + sums.(a1).(b1).m
 
+let sums_t sums (a1, b1) (a2, b2) = (* bounds included *)
+  sums.(a2 + 1).(b2 + 1).t - sums.(a2 + 1).(b1).t - sums.(a1).(b2 + 1).t + sums.(a1).(b1).t
 
 let string_of_cell = function M -> "M" | T -> "T"
 let pp_pizza_cell fmt c = Format.fprintf fmt "%s" (string_of_cell c)
