@@ -2,6 +2,6 @@
 
 (executable
   ((name main)
-   (libraries (containers containers.thread))
+   (libraries (containers parmap))
    (ocamlopt_flags (:standard -O3))
    ))

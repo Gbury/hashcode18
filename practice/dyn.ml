@@ -109,14 +109,12 @@ let dyn state line slice_length =
 let split_and_conquer ~j state f k =
   let n = Array.length state.State.pizza in
   let l = CCList.init (n / k + 1) (fun x -> x) in
-  let module M = CCPool.Make(struct let max_size = j end) in
-  let res = M.Fut.get @@ M.Fut.map_l (fun i ->
-      M.Fut.make1 (fun i ->
-          Format.eprintf "starting line %d@." (i * k);
-          let res = (f state (i * k) k).solution in
-          Format.eprintf "finished line %d@." (i * k);
-          res
-        ) i) l in
+  let res = Parmap.parmap (fun i ->
+      Format.eprintf "starting line %d@." (i * k);
+      let res = (f state (i * k) k).solution in
+      Format.eprintf "finished line %d@." (i * k);
+      res
+    ) (Parmap.L l) in
   List.flatten res
 
 let solve ~state ~j ~n = split_and_conquer ~j state dyn n

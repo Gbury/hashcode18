@@ -1,11 +1,10 @@
 B _build/default
 FLG -w -40
+PKG bigarray
 PKG bytes
 PKG containers
 PKG containers.monomorphic
-PKG containers.thread
+PKG parmap
 PKG result
-PKG threads
-PKG threads.posix
 PKG unix
 S .
