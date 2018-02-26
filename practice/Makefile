@@ -17,15 +17,10 @@ clean:
 doc:
 	jbuilder build @doc
 
-debug:
-	@echo "INPUT: $(INPUT)"
-	@echo "INPUT_RAW: $(INPUT_RAW)"
-	@echo "OUTPUT: $(OUTPUT)"
-
 test: $(OUTPUT)
 
 output/%.out: input/%.in bin
-	_build/default/main.exe < $< > $@
+	OCAMLRUNPARAM=b _build/default/main.exe < $< > $@
 
 nuke:
 	rm -rf output/*.out
