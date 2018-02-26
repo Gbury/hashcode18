@@ -108,7 +108,7 @@ let dyn state line slice_length =
 
 let split_and_conquer ~j state f k =
   let n = Array.length state.State.pizza in
-  let l = CCList.init (n / k) (fun x -> x) in
+  let l = CCList.init (n / k + 1) (fun x -> x) in
   let module M = CCPool.Make(struct let max_size = j end) in
   let res = M.Fut.get @@ M.Fut.map_l (fun i ->
       M.Fut.make1 (fun i ->
