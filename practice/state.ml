@@ -1,4 +1,6 @@
 
+let transposed = true
+
 type cell = M | T
 
 type stat = {
@@ -58,7 +60,7 @@ let transpose t =
       Array.init (Array.length t) (fun j -> t.(j).(i)))
 
 let mk l h pizza =
-  let pizza = transpose pizza in
+  let pizza = if transposed then transpose pizza else pizza in
   let sums = cumulated_sums_2d pizza
       (function M -> 1 | T -> 0) 0 ( + ) ( ~- ) in
   let slices = size_rects l h in
@@ -139,7 +141,10 @@ let pp_int_matrix fmt t =
   Format.pp_print_flush fmt ()
 
 let pp_rect fmt { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} =
-  Format.fprintf fmt "%d %d %d %d" a1 b1 a2 b2;
+  if transposed then
+    Format.fprintf fmt "%d %d %d %d" b1 a1 b2 a2
+  else
+    Format.fprintf fmt "%d %d %d %d" a1 b1 a2 b2;
   Format.pp_print_newline fmt ()
 
 let pp_solution fmt l =
@@ -147,3 +152,4 @@ let pp_solution fmt l =
   Format.pp_print_newline fmt ();
   List.iter (pp_rect fmt) l;
   Format.pp_print_flush fmt ()
+
