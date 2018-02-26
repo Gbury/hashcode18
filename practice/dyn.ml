@@ -106,7 +106,7 @@ let dyn state line slice_length =
   with
     Not_found -> { score = 0 ; line = line ; index = Array.make slice_length cols ; solution = [] }
 
-let split_and_conquer ~j state f k =
+let split_and_conquer state f k =
   let n = Array.length state.State.pizza in
   let l = CCList.init (n / k + 1) (fun x -> x) in
   let res = Parmap.parmap (fun i ->
@@ -117,5 +117,27 @@ let split_and_conquer ~j state f k =
     ) (Parmap.L l) in
   List.flatten res
 
-let solve ~state ~j ~n = split_and_conquer ~j state dyn n
+let solve ~state ~n = split_and_conquer state dyn n
+
+let dyn_dyn state n =
+  let pre = Array.init n (fun i ->
+      let t = Array.init (Array.length state.State.pizza - i) (fun r -> r) in
+      Array.of_list @@ Parmap.parmap (fun r ->
+          let t = dyn state r (i + 1) in
+          t.score, t.solution
+        ) (Parmap.A t)
+    )
+  in
+  let res = Array.make (Array.length state.State.pizza + 1) (0, []) in
+  for i = 1 to (Array.length state.State.pizza) do
+    let best = ref (0, []) in
+    for j = 1 to min i n do
+      let (s, r) = res.(i - j) in
+      let (s', r') = pre.(j - 1).(i - j) in
+      if s + s' > fst !best then best := (s + s', r' :: r)
+    done;
+    res.(i) <- !best
+  done;
+  let _, l = res.(Array.length state.State.pizza) in
+  List.flatten l
 
