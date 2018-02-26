@@ -3,5 +3,9 @@ FLG -w -40
 PKG bytes
 PKG containers
 PKG containers.monomorphic
+PKG containers.thread
 PKG result
+PKG threads
+PKG threads.posix
+PKG unix
 S .
