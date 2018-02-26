@@ -15,6 +15,8 @@ let sum_stat { m = m1 ; t = t1 } { m = m2 ; t = t2 } =
 
 let neg_stat { m ; t } = { m = -m ; t = -t }
 
+let stat_of_cell = function M -> { m = 1 ; t = 0 } | T -> { m = 0 ; t = 1 }
+
 type t = {
   l : int;
   h : int;
@@ -22,18 +24,23 @@ type t = {
   sums : stat array array;
 }
 
-let mk l h pizza =
-  let n = Array.length pizza in
-  let m = Array.length pizza.(0) in
-  let sums = Array.make_matrix (n + 1) (m + 1) {m = 0; t= 0} in
+let cumulated_sums_2d data of_cell zero add neg =
+  let n = Array.length data in
+  let m = Array.length data.(0) in
+  let sums = Array.make_matrix (n + 1) (m + 1) zero in
   for i = 1 to n do
     for j = 1 to m do
       sums.(i).(j) <- add
-          (sum_stat (sum_stat sums.(i - 1).(j) sums.(i).(j - 1))
-             (neg_stat sums.(i - 1).(j - 1)))
-          pizza.(i - 1).(j - 1)
+          (add (add sums.(i - 1).(j) sums.(i).(j - 1))
+             (neg sums.(i - 1).(j - 1)))
+          (of_cell data.(i - 1).(j - 1))
     done
   done;
+  sums
+
+let mk l h pizza =
+  let sums = cumulated_sums_2d pizza
+      stat_of_cell { m = 0; t = 0 } sum_stat neg_stat in
   { l; h; pizza; sums; }
 
 let sums_m sums (a1, b1) (a2, b2) = (* bounds included *)
