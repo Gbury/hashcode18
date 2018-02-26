@@ -14,7 +14,7 @@ type t = {
   l : int;
   h : int;
   pizza : cell array array;
-  sums : stat array array;
+  sums : int array array;
 }
 
 (* Making states *)
@@ -42,18 +42,18 @@ let cumulated_sums_2d data of_cell zero add neg =
 
 let mk l h pizza =
   let sums = cumulated_sums_2d pizza
-      stat_of_cell { m = 0; t = 0 } sum_stat neg_stat in
+      (function M -> 1 | T -> 0) 0 ( + ) ( ~- ) in
   { l; h; pizza; sums; }
 
 
 (* Eficient computing of sums *)
 
 let sums_m {sums; _} { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} = (* bounds included *)
-  sums.(a2 + 1).(b2 + 1).m - sums.(a2 + 1).(b1).m - sums.(a1).(b2 + 1).m + sums.(a1).(b1).m
+  sums.(a2 + 1).(b2 + 1) - sums.(a2 + 1).(b1) - sums.(a1).(b2 + 1) + sums.(a1).(b1)
 
-let sums_t {sums; _} { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} = (* bounds included *)
-  sums.(a2 + 1).(b2 + 1).t - sums.(a2 + 1).(b1).t - sums.(a1).(b2 + 1).t + sums.(a1).(b1).t
-
+let sums_t ({sums; _} as st) ({ tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} as rect) = (* bounds included *)
+  let area = (a2 - a1 + 1) * (b2 - b1 + 1) in
+  area - sums_m st rect
 
 (* Bound checking *)
 
@@ -90,5 +90,15 @@ let pp_stat_row fmt a =
 
 let pp_stat_matrix fmt t =
   Array.iter (pp_stat_row fmt) t;
+  Format.pp_print_flush fmt ()
+
+let pp_int fmt x = Format.fprintf fmt "%d " x
+
+let pp_int_row fmt a =
+  Array.iter (pp_int fmt) a;
+  Format.pp_print_newline fmt ()
+
+let pp_int_matrix fmt t =
+  Array.iter (pp_int_row fmt) t;
   Format.pp_print_flush fmt ()
 
