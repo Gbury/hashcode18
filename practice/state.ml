@@ -18,6 +18,8 @@ type t = {
   slices : rect list;
 }
 
+type solution = rect list
+
 (* Making states *)
 
 let sum_stat { m = m1 ; t = t1 } { m = m2 ; t = t2 } =
@@ -57,6 +59,12 @@ let mk l h pizza =
   let slices = size_rects l h in
   { l; h; pizza; sums; slices; }
 
+let area { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} =
+  (a2 - a1 + 1) * (b2 - b1 + 1)
+
+let score sol =
+  sol |> List.map area |> List.fold_left ( + ) 0
+
 (* Some fn on points and rectangles *)
 
 let add p p' = {
@@ -72,9 +80,8 @@ let shift p rect = { tl = add rect.tl p; br = add rect.br p; }
 let sums_m {sums; _} { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} = (* bounds included *)
   sums.(a2 + 1).(b2 + 1) - sums.(a2 + 1).(b1) - sums.(a1).(b2 + 1) + sums.(a1).(b1)
 
-let sums_t ({sums; _} as st) ({ tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} as rect) = (* bounds included *)
-  let area = (a2 - a1 + 1) * (b2 - b1 + 1) in
-  area - sums_m st rect
+let sums_t st rect =
+  area rect - sums_m st rect
 
 (* Bound checking *)
 
@@ -123,3 +130,12 @@ let pp_int_matrix fmt t =
   Array.iter (pp_int_row fmt) t;
   Format.pp_print_flush fmt ()
 
+let pp_rect fmt { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} =
+  Format.fprintf fmt "%d %d %d %d" a1 b1 a2 b2;
+  Format.pp_print_newline fmt ()
+
+let pp_solution fmt l =
+  Format.fprintf fmt "%d" (List.length l);
+  Format.pp_print_newline fmt ();
+  List.iter (pp_rect fmt) l;
+  Format.pp_print_flush fmt ()
