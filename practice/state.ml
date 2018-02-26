@@ -6,16 +6,9 @@ type stat = {
   t : int;
 }
 
-let add_m s = { s with m = s.m + 1; }
-let add_t s = { s with t = s.t + 1; }
-let add s = function M -> add_m s | T -> add_t s
+type point = { r : int; c : int; }
 
-let sum_stat { m = m1 ; t = t1 } { m = m2 ; t = t2 } =
-  { m = m1 + m2 ; t = t1 + t2 }
-
-let neg_stat { m ; t } = { m = -m ; t = -t }
-
-let stat_of_cell = function M -> { m = 1 ; t = 0 } | T -> { m = 0 ; t = 1 }
+type rect = { tl : point; br : point; }
 
 type t = {
   l : int;
@@ -23,6 +16,15 @@ type t = {
   pizza : cell array array;
   sums : stat array array;
 }
+
+(* Making states *)
+
+let sum_stat { m = m1 ; t = t1 } { m = m2 ; t = t2 } =
+  { m = m1 + m2 ; t = t1 + t2 }
+
+let neg_stat { m ; t } = { m = -m ; t = -t }
+
+let stat_of_cell = function M -> { m = 1 ; t = 0 } | T -> { m = 0 ; t = 1 }
 
 let cumulated_sums_2d data of_cell zero add neg =
   let n = Array.length data in
@@ -43,11 +45,30 @@ let mk l h pizza =
       stat_of_cell { m = 0; t = 0 } sum_stat neg_stat in
   { l; h; pizza; sums; }
 
-let sums_m sums (a1, b1) (a2, b2) = (* bounds included *)
+
+(* Eficient computing of sums *)
+
+let sums_m {sums; _} { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} = (* bounds included *)
   sums.(a2 + 1).(b2 + 1).m - sums.(a2 + 1).(b1).m - sums.(a1).(b2 + 1).m + sums.(a1).(b1).m
 
-let sums_t sums (a1, b1) (a2, b2) = (* bounds included *)
+let sums_t {sums; _} { tl = { r = a1; c =  b1}; br = { r = a2; c = b2 };} = (* bounds included *)
   sums.(a2 + 1).(b2 + 1).t - sums.(a2 + 1).(b1).t - sums.(a1).(b2 + 1).t + sums.(a1).(b1).t
+
+
+(* Bound checking *)
+
+let is_legal state rect =
+  rect.tl.r >= 0 && rect.tl.c >= 0 &&
+  rect.br.r < Array.length state.pizza &&
+  rect.br.c < Array.length state.pizza.(0)
+
+let is_valid_rect state rect =
+  is_legal state rect &&
+  sums_m state rect >= state.l &&
+  sums_t state rect >= state.l
+
+
+(* Some printing *)
 
 let string_of_cell = function M -> "M" | T -> "T"
 let pp_pizza_cell fmt c = Format.fprintf fmt "%s" (string_of_cell c)
