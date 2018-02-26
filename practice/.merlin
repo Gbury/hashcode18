@@ -1,0 +1,7 @@
+B _build/default
+FLG -w -40
+PKG bytes
+PKG containers
+PKG containers.monomorphic
+PKG result
+S .
