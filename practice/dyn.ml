@@ -48,3 +48,53 @@ let add_rect config rect =
     { score; line; index; solution = rect :: config.solution; }
   end
 
+type st = index list array * (index, config) Hashtbl.t
+
+let add_config (h, q) config =
+  let index = config.index in
+  match Hashtbl.find q index with
+  | config2 ->
+    if config.score > config2.score then
+      Hashtbl.replace q index config
+  | exception Not_found -> begin
+      let k = Array.fold_left (+) 0 index in
+      h.(k) <- index :: h.(k);
+      Hashtbl.add q index config
+    end
+
+let inf = 1_000_000_000
+let valid_rects state config =
+  let mn = Array.fold_left min inf config.index in
+  let cols = Array.length (state.State.pizza.(0)) in
+  let result = ref [] in
+  Array.iteri (fun i col ->
+      if col = mn then begin
+        let p = State.{ r = config.line + i ; c = col } in
+        result := (List.map (add_rect config) (List.filter (valid_rect config) (possible_rect_list state p))) @ !result;
+        if col < cols then begin
+          let nindex = Array.copy config.index in
+          nindex.(i) <- col + 1;
+          result := { config with index = nindex } :: !result
+        end
+    end
+    ) config.index;
+  !result
+
+let process_config state st config =
+  List.iter (add_config st) (valid_rects state config)
+
+let dyn state line slice_length =
+  let index = Array.make slice_length 0 in
+  let config = { score = 0 ; line = line ; index = index ; solution = [] } in
+  let cols = Array.length (state.State.pizza.(0)) in
+  let h = Array.make (cols * slice_length + 1) [] in
+  let q = Hashtbl.create 65537 in
+  Hashtbl.add q index config;
+  h.(0) <- [index];
+  for i = 0 to cols * slice_length do
+    List.iter (fun index -> process_config state (h, q) (Hashtbl.find q index)) h.(i)
+  done;
+  try
+    Hashtbl.find q (Array.make slice_length cols)
+  with
+    Not_found -> { score = 0 ; line = line ; index = Array.make slice_length cols ; solution = [] }
