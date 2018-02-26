@@ -2,4 +2,6 @@
 
 (executable
   ((name main)
-   (libraries (containers))))
+   (libraries (containers))
+   (ocamlopt_flags (:standard -O3))
+   ))
