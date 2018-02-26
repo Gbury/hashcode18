@@ -15,6 +15,7 @@ type t = {
   h : int;
   pizza : cell array array;
   sums : stat array array;
+  slices : rect list;
 }
 
 (* Making states *)
@@ -25,6 +26,16 @@ let sum_stat { m = m1 ; t = t1 } { m = m2 ; t = t2 } =
 let neg_stat { m ; t } = { m = -m ; t = -t }
 
 let stat_of_cell = function M -> { m = 1 ; t = 0 } | T -> { m = 0 ; t = 1 }
+
+let size_rects l h =
+  let res = ref [] in
+  for i = 1 to h do
+    for j = 1 to h do
+      if i * j <= h && i * j >= 2 * l then
+        res := { tl = { r = 0; c = 0; }; br = { r = i - 1; c = j - 1; }; } :: !res
+    done
+  done;
+  !res
 
 let cumulated_sums_2d data of_cell zero add neg =
   let n = Array.length data in
@@ -43,7 +54,17 @@ let cumulated_sums_2d data of_cell zero add neg =
 let mk l h pizza =
   let sums = cumulated_sums_2d pizza
       stat_of_cell { m = 0; t = 0 } sum_stat neg_stat in
-  { l; h; pizza; sums; }
+  let slices = size_rects l h in
+  { l; h; pizza; sums; slices; }
+
+(* Some fn on points and rectangles *)
+
+let add p p' = {
+  r = p.r + p'.r;
+  c = p.c + p'.c;
+}
+
+let shift p rect = { tl = add rect.tl p; br = add rect.br p; }
 
 
 (* Eficient computing of sums *)
@@ -62,7 +83,7 @@ let is_legal state rect =
   rect.br.r < Array.length state.pizza &&
   rect.br.c < Array.length state.pizza.(0)
 
-let is_valid_rect state rect =
+let is_valid state rect =
   is_legal state rect &&
   sums_m state rect >= state.l &&
   sums_t state rect >= state.l
