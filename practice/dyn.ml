@@ -124,6 +124,7 @@ let dyn_dyn state n =
       let t = Array.init (Array.length state.State.pizza - i) (fun r -> r) in
       Array.of_list @@ Parmap.parmap (fun r ->
           let t = dyn state r (i + 1) in
+          Format.eprintf "Slice (%d, %d)@." (i + 1) r;
           t.score, t.solution
         ) (Parmap.A t)
     )
