@@ -8,6 +8,13 @@ type config = {
   solution : State.rect list;
 }
 
+let pp_index fmt a =
+  Array.iter (fun x -> Format.fprintf fmt "%d@ " x) a
+
+let pp fmt config =
+  Format.fprintf fmt "@[<hv>(%d) %d -@ %a@ @[<hov>%a@]@]"
+    config.score config.line pp_index config.index State.pp_solution config.solution
+
 let possible_rect_list state p =
   let l = List.map (State.shift p) state.State.slices in
   List.filter (State.is_valid state) l
@@ -31,9 +38,9 @@ let valid_rect config rect =
 
 let add_rect_idx line index rect =
   let res = Array.copy index in
-  let new_c = rect.State.br.c in
+  let new_c = rect.State.br.c + 1 in
   let i = rect.State.tl.r - line in
-  let j = i + State.height rect in
+  let j = i + State.height rect - 1 in
   for k = i to j do
     res.(k) <- new_c
   done;
@@ -43,7 +50,7 @@ let add_rect config rect =
   if not (valid_rect config rect) then raise Exit
   else begin
     let line = config.line in
-    let score = State.(height rect * width rect) + config.score in
+    let score = State.area rect + config.score in
     let index = add_rect_idx config.line config.index rect in
     { score; line; index; solution = rect :: config.solution; }
   end
@@ -98,3 +105,16 @@ let dyn state line slice_length =
     Hashtbl.find q (Array.make slice_length cols)
   with
     Not_found -> { score = 0 ; line = line ; index = Array.make slice_length cols ; solution = [] }
+
+
+let split_and_conquer state f k =
+  let n = Array.length state.State.pizza in
+  let res = ref [] in
+  for i = 0 to n / k do
+    Format.eprintf "at line: %d@." (i * k);
+    res := (f state (i * k) k).solution @ !res
+  done;
+  !res
+
+let solve state n = split_and_conquer state dyn n
+

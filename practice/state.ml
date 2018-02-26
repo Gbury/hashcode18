@@ -72,8 +72,8 @@ let add p p' = {
   c = p.c + p'.c;
 }
 
-let width { tl; br; } = tl.c - br.c + 1
-let height { tl; br; } = tl.r - br.r + 1
+let width { tl; br; } = br.c - tl.c + 1
+let height { tl; br; } = br.r - tl.r + 1
 
 let shift p rect = { tl = add rect.tl p; br = add rect.br p; }
 
