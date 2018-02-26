@@ -10,6 +10,11 @@ let add_m s = { s with m = s.m + 1; }
 let add_t s = { s with t = s.t + 1; }
 let add s = function M -> add_m s | T -> add_t s
 
+let sum_stat { m = m1 ; t = t1 } { m = m2 ; t = t2 } =
+  { m = m1 + m2 ; t = t1 + t2 }
+
+let neg_stat { m ; t } = { m = -m ; t = -t }
+
 type t = {
   l : int;
   h : int;
@@ -23,14 +28,10 @@ let mk l h pizza =
   let sums = Array.make_matrix (n + 1) (m + 1) {m = 0; t= 0} in
   for i = 1 to n do
     for j = 1 to m do
-      let c = ref sums.(i - 1).(j - 1) in
-      for k = 0 to i - 2 do
-        c := add !c pizza.(k).(j - 1)
-      done;
-      for k = 0 to j - 2 do
-        c := add !c pizza.(i - 1).(k)
-      done;
-      sums.(i).(j) <- add !c pizza.(i - 1).(j - 1)
+      sums.(i).(j) <- add
+          (sum_stat (sum_stat sums.(i - 1).(j) sums.(i).(j - 1))
+             (neg_stat sums.(i - 1).(j - 1)))
+          pizza.(i - 1).(j - 1)
     done
   done;
   { l; h; pizza; sums; }
