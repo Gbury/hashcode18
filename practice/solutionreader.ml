@@ -2,7 +2,7 @@
 let inslice m s =
   for i = s.State.tl.State.r to s.State.br.State.r do
     for j = s.State.tl.State.c to s.State.br.State.c do
-      m.(p.State.r).(p.State.c) <- 1
+      m.(i).(j) <- 1
     done;
   done
 
