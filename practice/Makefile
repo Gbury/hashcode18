@@ -6,9 +6,12 @@ INPUT=$(shell find input -name '*.in')
 INPUT_RAW=$(notdir $(INPUT))
 OUTPUT=$(addprefix output/, $(INPUT_RAW:.in=.out))
 
+SOURCES=$(shell find . -name '*.ml')
+BIN=_build/default/main.exe
+
 all: bin
 
-bin:
+$(BIN): $(SOURCES)
 	jbuilder build main.exe -j $J
 
 clean:
@@ -19,8 +22,11 @@ doc:
 
 test: $(OUTPUT)
 
-output/%.out: input/%.in bin
-	OCAMLRUNPARAM=b _build/default/main.exe < $< > $@
+output/%.out: input/%.in $(BIN)
+	OCAMLRUNPARAM=b $(BIN) < $< > $@
+
+analyze/%.analyze: input/%.in output/%.out $(BIN)
+	OCAMLRUNPARAM=b $(BIN) input/$*.in output/$*.out > $@
 
 nuke:
 	rm -rf output/*.out
