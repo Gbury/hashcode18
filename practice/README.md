@@ -87,7 +87,7 @@ of chunks.
   quite satisfying (it took about 15 minutes to run on a 20-core machine using 30 processes (and sadly not 40 because
   that caused an Out of memory error in at least one chunk)).
 
-## Grinding fort 3 more points
+## Grinding for 3 more points
 
 But we weren't finished ! Instead of focusing on the big input, which gives a lot more points, we really, really wanted
 to find an optimal and complete solution for the medium input, because we felt we were sooo close. So on a hunch,
