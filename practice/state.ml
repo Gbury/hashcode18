@@ -1,5 +1,5 @@
 
-let transposed = true
+let transposed = false
 
 type cell = M | T
 
