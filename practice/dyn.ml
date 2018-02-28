@@ -141,7 +141,7 @@ let dyn_dyn state n =
         t.score, t.solution
       ) (Parmap.A t) in
     Gc.full_major ();
-    pre.(i-1) <- a
+    pre.(i) <- a
   done;
   let res = Array.make (Array.length state.State.pizza + 1) (0, []) in
   for i = 1 to (Array.length state.State.pizza) do
