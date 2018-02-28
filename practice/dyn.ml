@@ -119,16 +119,30 @@ let split_and_conquer state f k =
 
 let solve ~state ~n = split_and_conquer state dyn n
 
+let cores_of_i = function
+  | 0 -> 39
+  | 1 -> 35
+  | 2 -> 35
+  | 3 -> 35
+  | 4 -> 25
+  | 5 -> 8
+  | _ -> 1
+
 let dyn_dyn state n =
-  let pre = Array.init n (fun i ->
-      let t = Array.init (Array.length state.State.pizza - i) (fun r -> r) in
-      Array.of_list @@ Parmap.parmap (fun r ->
-          let t = dyn state r (i + 1) in
-          Format.eprintf "Slice (%d, %d)@." (i + 1) r;
-          t.score, t.solution
-        ) (Parmap.A t)
-    )
-  in
+  let pre = Array.make n [||] in
+  for i = n - 1 downto 0 do
+    Format.eprintf "Starting slices of length %d@." (i + 1);
+    let t = Array.init (Array.length state.State.pizza - i) (fun r -> r) in
+    let a = Array.of_list @@ Parmap.parmap ~ncores:(cores_of_i (i + 1)) (fun r ->
+        let start = Unix.gettimeofday () in
+        let t = dyn state r (i + 1) in
+        let stop = Unix.gettimeofday () in
+        Format.eprintf "Slice (%d, %d) in %fs@." (i + 1) r (stop -. start);
+        t.score, t.solution
+      ) (Parmap.A t) in
+    Gc.full_major ();
+    pre.(i-1) <- a
+  done;
   let res = Array.make (Array.length state.State.pizza + 1) (0, []) in
   for i = 1 to (Array.length state.State.pizza) do
     let best = ref (0, []) in

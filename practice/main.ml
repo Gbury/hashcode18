@@ -9,7 +9,7 @@ let () =
       CCFormat.(list ~sep:(return "@ ") (hovbox @@ pair int int)) unused
   end else begin
     let state = Input.read_state Scanf.Scanning.stdin in
-    let res = Dyn.dyn_dyn state 4 in
+    let res = Dyn.dyn_dyn state 5 in
     Format.eprintf "score: %d@." (State.score res);
     Format.printf "%a@." State.pp_solution res
   end

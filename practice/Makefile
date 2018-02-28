@@ -9,7 +9,7 @@ OUTPUT=$(addprefix output/, $(INPUT_RAW:.in=.out))
 SOURCES=$(shell find . -name '*.ml')
 BIN=_build/default/main.exe
 
-all: bin
+all: $(BIN)
 
 $(BIN): $(SOURCES)
 	jbuilder build main.exe -j $J
