@@ -9,6 +9,9 @@ type t = {
 }
 
 let equal r r' = r.id = r'.id
+let compare r r' = compare r.id r'.id
+module Set = Set.Make(struct type nonrec t = t let compare = compare end)
+module Map = Map.Make(struct type nonrec t = t let compare = compare end)
 
 let pp_id fmt r = Format.fprintf fmt "%d" r.id
 

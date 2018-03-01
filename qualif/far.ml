@@ -105,9 +105,9 @@ let center b =
 let dist pos b =
   Point.dist pos (center b)
 
-let closest_blocks blocks c =
+let closest_blocks blocks pos =
   let all_blocks = CCList.flat_map Array.to_list @@ Array.to_list blocks.contents in
-  let l = CCList.map (fun s -> (s.block, dist c.pos s.block)) all_blocks in
+  let l = CCList.map (fun s -> (s.block, dist pos s.block)) all_blocks in
   let l' = CCList.sort (fun (_, n) (_, n') -> n - n') l in
   CCList.map fst l'
 
@@ -127,7 +127,8 @@ let rec find_ride_aux state blocks c b =
   let l = List.filter (fun r -> Ride.is_reachable r c.time c.pos) s.starting in
   let l' = List.map (fun r ->
       let b' = find_block blocks r.Ride.stop in
-      let s = blocks.contents.(b'.x).(b'.y) in
+      let l = CCList.take 5 (closest_blocks (center b')) in
+      let l' = List.map (fun b'' -> List.length blocks.contents.(b''.x).(b''.y).starting) l in
       let score = c_score (List.length s.starting) (dist c.pos b') in
       (r, score, b'.x, b'.y)) l in
   let l'' = List.sort (fun (_, n, _, _) (_, n', _, _) -> n' - n) l' in
