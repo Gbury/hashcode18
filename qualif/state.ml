@@ -19,4 +19,12 @@ let score t ride time point =
   let bonus = if time + d <= ride.Ride.first then t.b else 0 in
   bonus + ride.Ride.dist
 
+let pp_solution fmt a =
+  Array.iter (fun a ->
+      let n = Array.length a in
+      Format.fprintf fmt "%d " n;
+      Array.iter (fun r ->
+          Format.fprintf fmt "%d " r.Ride.id
+        ) a;
+      Format.fprintf fmt "@.") a
 

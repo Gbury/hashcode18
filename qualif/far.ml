@@ -159,12 +159,3 @@ let far_block state l =
   let () = solve state blocks config in
   Array.map (fun c -> Array.of_list @@ List.rev c.rides) config
 
-let pp fmt a =
-  Array.iter (fun a ->
-      let n = Array.length a in
-      Format.fprintf fmt "%d " n;
-      Array.iter (fun r ->
-          Format.fprintf fmt "%d " r.Ride.id
-        ) a;
-      Format.fprintf fmt "@.") a
-
