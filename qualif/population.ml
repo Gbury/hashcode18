@@ -66,6 +66,58 @@ let rec list_end t time point = function
 
 let () = Random.init 42
 
+let improve t sol =
+  let taken = Array.make (Array.length t.State.rides) false in
+  let cars = Array.init t.State.f (fun i -> (0, Point.mk 0 0, List.rev (Array.to_list sol.(i))) in
+  let score = ref 0 in
+  let rec loop on =
+    let change = ref false in
+    Array.iter (fun i ->
+        let time, point, rides = cars.(i) in
+        let pp = best_pops t taken time point in
+    if pp = [] then
+      ()
+    else
+      (List.iter (fun ride -> taken.(ride.Ride.id) <- true) pp;
+       let te, pe = list_end t time point pp in
+       cars.(i) <- (te, pe, List.rev_append pp rides);
+       score := !score + list_score t time point pp;
+       change := true
+       (* ;Format.eprintf "Score = %d@." !score *) )) on;
+    if !change then loop on
+  in
+  Array.iter (fun x -> List.iter (fun ride -> taken.(ride.Ride.id) <- true) x) sol;
+  let climb () =
+    let crs = Array.make (Array.length cars) false in
+    for i = 1 to 20 do
+      let n = Random.int (Array.length cars) in
+      crs.(n) <- true
+    done;
+    let l = ref [] in
+    Array.iteri (fun x b -> if b then l := x :: !l) crs;
+    let old_cars = Array.copy cars in
+    let old_score = !score in
+    let old_taken = Array.copy taken in
+    List.iter (fun i ->
+        let (_, _, rides) = cars.(i) in
+        List.iter (fun rd -> taken.(rd.Ride.id) <- false) rides;
+        cars.(i) <- (0, Point.mk 0 0, []);
+        score := !score - list_score t 0 (Point.mk 0 0) (List.rev rides);
+      ) !l;
+    loop (Array.of_list !l);
+    Format.eprintf "Score = %d@." !score;
+    if !score <= old_score then begin
+      score := old_score;
+      Array.iteri (fun i x -> cars.(i) <- x) old_cars;
+      Array.iteri (fun i x -> taken.(i) <- x) old_taken;
+    end
+  in
+  for i = 1 to 100 do climb () done;
+  Format.eprintf "Score = %d@." !score;
+  Array.map (fun (_, _, rides) -> Array.of_list (List.rev rides)) cars
+
+
+
 let solve t =
   let taken = Array.make (Array.length t.State.rides) false in
   let cars = Array.make t.State.f (0, Point.mk 0 0, []) in
