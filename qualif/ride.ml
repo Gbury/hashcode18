@@ -10,6 +10,8 @@ type t = {
 
 let equal r r' = r.id = r'.id
 
+let pp_id fmt r = Format.fprintf fmt "%d" r.id
+
 let mk id a b x y s f =
   let start = Point.mk a b in
   let stop = Point.mk x y in
