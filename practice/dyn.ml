@@ -98,8 +98,8 @@ let dyn state line slice_length =
   let q = Hashtbl.create 65537 in
   Hashtbl.add q index config;
   h.(0) <- [index];
-  for i = 0 to cols * slice_length do
-    List.iter (fun index -> process_config state (h, q) (Hashtbl.find q index)) h.(i)
+  for i = 0 to cols * slice_length - 1 do
+    List.iter (fun index -> process_config state (h, q) (Hashtbl.find q index); Hashtbl.remove q index) h.(i);
   done;
   try
     Hashtbl.find q (Array.make slice_length cols)
