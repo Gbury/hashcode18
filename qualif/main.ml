@@ -1,5 +1,6 @@
 
 let () =
-  Format.eprintf "Hello world !@."
+  let _ = Input.read_input Scanf.Scanning.stdin in
+  Format.eprintf "Ok@."
 
 
