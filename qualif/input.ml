@@ -22,7 +22,7 @@ let read_input ic =
   State.mk f b t r c a
 
 let read_solution state ic =
-  Array.init n (fun _ ->
+  Array.init state.State.f (fun _ ->
       let m = read_int ic in
       Array.init m (fun _ ->
           let i = read_int ic in
