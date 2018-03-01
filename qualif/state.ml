@@ -28,3 +28,7 @@ let pp_solution fmt a =
         ) a;
       Format.fprintf fmt "@.") a
 
+let write_solution score sol =
+  let out = open_out (Format.sprintf "output/sol.%d" score) in
+  let fmt = Format.formatter_of_out_channel out in
+  pp_solution fmt sol
