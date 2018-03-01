@@ -8,7 +8,7 @@ let heuristic2 t score ttime endpoint = float_of_int score /. float_of_int ttime
 
 let max_pop = 15
 let prof = 10
-let take_prof = 2
+let take_prof = 5
 
 let next t taken taken2 time point =
   Array.to_list t.State.rides |>
