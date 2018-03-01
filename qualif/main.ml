@@ -3,7 +3,8 @@
 
 let () =
   let state = Input.read_input Scanf.Scanning.stdin in
-  let res = Far.far_block state 50 in
-  Format.printf "%a" Far.pp res
+  let res = Population.solve state in
+  Format.printf "%a@." State.pp_solution res;
+  Format.eprintf "Ok@."
 
 
