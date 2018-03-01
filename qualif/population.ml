@@ -68,7 +68,7 @@ let () = Random.init 42
 
 let improve t sol =
   let taken = Array.make (Array.length t.State.rides) false in
-  let cars = Array.init t.State.f (fun i -> (0, Point.mk 0 0, List.rev (Array.to_list sol.(i))) in
+  let cars = Array.init t.State.f (fun i -> (0, Point.mk 0 0, List.rev (Array.to_list sol.(i)))) in
   let score = ref 0 in
   let rec loop on =
     let change = ref false in
@@ -86,7 +86,7 @@ let improve t sol =
        (* ;Format.eprintf "Score = %d@." !score *) )) on;
     if !change then loop on
   in
-  Array.iter (fun x -> List.iter (fun ride -> taken.(ride.Ride.id) <- true) x) sol;
+  Array.iter (fun x -> Array.iter (fun ride -> taken.(ride.Ride.id) <- true) x) sol;
   let climb () =
     let crs = Array.make (Array.length cars) false in
     for i = 1 to 20 do
@@ -110,6 +110,7 @@ let improve t sol =
       score := old_score;
       Array.iteri (fun i x -> cars.(i) <- x) old_cars;
       Array.iteri (fun i x -> taken.(i) <- x) old_taken;
+      State.write_solution !score (Array.map (fun (_, _, rides) -> (Array.of_list (List.rev rides))) cars)
     end
   in
   for i = 1 to 100 do climb () done;
@@ -163,6 +164,7 @@ let solve t =
       score := old_score;
       Array.iteri (fun i x -> cars.(i) <- x) old_cars;
       Array.iteri (fun i x -> taken.(i) <- x) old_taken;
+      State.write_solution !score (Array.map (fun (_, _, rides) -> (Array.of_list (List.rev rides))) cars)
     end
   in
   for i = 1 to 100 do climb () done;
