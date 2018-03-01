@@ -87,35 +87,34 @@ let find_blocks seen blocks =
     Some ret
 
 let rec find_ride state blocks c seen =
-  let (i, j) = find_block blocks c.pos in
-  let s = blocks.contents.(i).(j) in
+  let b = find_block blocks c.pos in
+  let s = blocks.contents.(b.x).(b.y) in
   let l = List.map (fun r ->
-      let (x, y) = find_block blocks r.Ride.stop in
-      let s = blocks.contents.(x).(y) in
-      (r, List.length s.starting, x, y)) s.starting in
-  let l' = List.sort (fun (_, n, _, _) (_, n', _, _) ->
-
-
-  match find_blocks seen blocks with
-  | None -> None
-  | Some (i, j) ->
-    let b = blocks.contents.(i).(j) in
-    let l = List.filter (fun r ->
-        Ride.is_reachable r c.time c.pos) b.starting in
-    let l' = List.map (fun r -> (r, State.score state r c.time c.pos)) l in
-    let l'' = List.sort (fun (_, s) (_, s') -> s' - s) l' in
-    begin match l'' with
-      | [] -> find_ride state blocks c ((i, j) :: seen)
-      | (r, _) :: _ -> Some r
+      let b' = find_block blocks r.Ride.stop in
+      let s = blocks.contents.(b'.x).(b'.y) in
+      (r, List.length s.starting, b'.x, b'.y)) s.starting in
+  let l' = List.sort (fun (_, n, _, _) (_, n', _, _) -> n' - n) l in
+  match l' with
+  | (r, _, _, _) :: _ -> Some r
+  | [] ->
+    begin match find_blocks seen blocks with
+      | None -> None
+      | Some (i, j) ->
+        let b = blocks.contents.(i).(j) in
+        let l = List.filter (fun r ->
+            Ride.is_reachable r c.time c.pos) b.starting in
+        let l' = List.map (fun r -> (r, State.score state r c.time c.pos)) l in
+        let l'' = List.sort (fun (_, s) (_, s') -> s' - s) l' in
+        begin match l'' with
+          | [] -> find_ride state blocks c ((i, j) :: seen)
+          | (r, _) :: _ -> Some r
+        end
     end
 
 let rec solve state blocks config =
   let i = find_next_car config in
   let c = config.(i) in
-  tick blocks c.time;
-  match find_ride state blocks c [] with
-  | None ->
-    config.(i) <- { c with 
+  tick blocks c.time
 
 
 let far_block state l =

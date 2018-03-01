@@ -24,3 +24,4 @@ let is_reachable t time point =
   let d = Point.dist point t.start in
   is_feasible t (time + d)
 
+
