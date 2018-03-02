@@ -139,7 +139,8 @@ let solve t =
        (* ;Format.eprintf "Score = %d@." !score *) )) on;
     if !change then loop on
   in
-  loop (Array.init (Array.length cars) (fun i -> i));
+  (* loop (Array.init (Array.length cars) (fun i -> i)); *)
+  for i = 0 to Array.length cars - 1 do loop [|i|]; Format.eprintf "tScore = %d@." !score; done;
   Format.eprintf "Score = %d@." !score;
   let climb () =
     let crs = Array.make (Array.length cars) false in
@@ -158,7 +159,8 @@ let solve t =
         cars.(i) <- (0, Point.mk 0 0, []);
         score := !score - list_score t 0 (Point.mk 0 0) (List.rev rides);
       ) !l;
-    loop (Array.of_list !l);
+    (* loop (Array.of_list !l); *)
+    List.iter (fun i -> loop [|i|]) !l;
     Format.eprintf "Score = %d@." !score;
     if !score <= old_score then begin
       score := old_score;
